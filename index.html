@@ -157,6 +157,9 @@
   .contact a:hover { color: var(--accent); }
   .contact a .ic { font-size: 14px; }
   .contact a .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  .contact .c-qr { margin-top: 14px; display: flex; flex-direction: column; align-items: center; gap: 7px; }
+  .contact .c-qr img { width: 128px; height: 128px; display: block; background: #fff; padding: 7px; border-radius: 12px; border: 1px solid var(--line); }
+  .contact .c-qr-cap { font-size: 11px; color: var(--faint); margin: 0; }
 </style>
 
 <div class="wrap">
@@ -248,6 +251,12 @@
       <a href="tel:+821024039284"><span class="ic">📞</span><span class="num">010-2403-9284</span></a>
       <a href="mailto:masterkyungil@gmail.com"><span class="ic">✉️</span>masterkyungil@gmail.com</a>
       <a href="https://open.kakao.com/o/sUVx4Oli" target="_blank" rel="noopener"><span class="ic">💬</span>카카오톡 오픈채팅</a>
+    </div>
+    <div class="c-qr">
+      <a href="https://open.kakao.com/o/sUVx4Oli" target="_blank" rel="noopener" aria-label="카카오톡 오픈채팅 QR코드">
+        <img src="data:image/png;base64,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" alt="카카오톡 오픈채팅 QR코드" width="128" height="128">
+      </a>
+      <p class="c-qr-cap">💬 QR을 찍으면 카톡 오픈채팅으로 연결돼요</p>
     </div>
   </div>
 
