@@ -1,3 +1,4 @@
+<meta charset="utf-8">
 <title>켈리 공식 계산기 — 얼마를 투자할까?</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
@@ -221,7 +222,7 @@
       <p class="result-label" id="rlabel">추천 · 안정적(하프 켈리)</p>
       <p class="headline" id="headline">
         <span class="money" id="amount">88만원</span><br>
-        가진 돈의 <b id="pct" style="color:var(--accent)">8.8%</b> 만큼 투자하세요.
+        <span id="tail">가진 돈의 <b style="color:var(--accent)">8.8%</b> 만큼 투자하세요.</span>
       </p>
 
       <div class="bar-track"><div class="bar-fill" id="bar"></div></div>
@@ -294,11 +295,12 @@
 
     const r = kelly(p, b);
     const msg = $("msg");
+    const amountEl = $("amount"), tailEl = $("tail");
 
     if (r.err) {
-      $("amount").textContent = "—";
-      $("headline").querySelector("br").nextSibling; // noop
-      $("pct").textContent = "—";
+      amountEl.textContent = "—";
+      amountEl.style.color = "var(--muted)";
+      tailEl.textContent = "입력값을 확인해 주세요.";
       $("bar").style.width = "0%";
       msg.textContent = r.err; msg.className = "msg show danger";
       return;
@@ -308,20 +310,18 @@
     const pctText = (applied * 100).toFixed(1) + "%";
     const investAmt = isNaN(capital) ? null : capital * applied;
 
-    $("pct").textContent = pctText;
-    $("amount").textContent = investAmt === null ? pctText : fmt(investAmt) + "만원";
     $("bar").style.width = Math.min(applied * 100, 100) + "%";
 
     if (r.fStar === 0) {
-      $("amount").textContent = "0원";
-      $("pct").textContent = "0%";
-      $("headline").innerHTML = '<span class="money" style="color:var(--danger)">투자하지 마세요</span><br>이 조건에서는 하면 할수록 손해예요.';
+      amountEl.textContent = "투자하지 마세요";
+      amountEl.style.color = "var(--danger)";
+      tailEl.textContent = "이 조건에서는 하면 할수록 손해예요.";
       msg.innerHTML = "질 확률과 손실률이 커서 <b>장기적으로 돈을 잃는 구조</b>예요. 승률을 높이거나, 이길 때 수익률을 키우고 질 때 손실률을 줄일 방법을 찾아보세요.";
       msg.className = "msg show danger";
     } else {
-      $("headline").innerHTML = '<span class="money" id="amount">' +
-        (investAmt === null ? pctText : fmt(investAmt) + "만원") +
-        '</span><br>가진 돈의 <b style="color:var(--accent)">' + pctText + '</b> 만큼 투자하세요.';
+      amountEl.style.color = "var(--accent)";
+      amountEl.textContent = investAmt === null ? pctText : fmt(investAmt) + "만원";
+      tailEl.innerHTML = '가진 돈의 <b style="color:var(--accent)">' + pctText + '</b> 만큼 투자하세요.';
       if (r.fStar > 0.5) {
         msg.innerHTML = "이론상 비중이 꽤 높게 나와요. 추정이 조금만 빗나가도 크게 흔들릴 수 있으니 <b>'안정적' 또는 '보수적'</b>을 권해요.";
         msg.className = "msg show warn";
