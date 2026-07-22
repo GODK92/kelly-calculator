@@ -1,0 +1,328 @@
+<title>켈리 공식 계산기 — 얼마를 투자할까?</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root {
+    --bg: #f6f8fb;
+    --panel: #ffffff;
+    --panel-2: #eef2f7;
+    --ink: #10151c;
+    --muted: #5c6b7a;
+    --faint: #8a97a5;
+    --line: #dde4ec;
+    --accent: #0f9d78;
+    --accent-soft: #d8f0e7;
+    --warn: #c07d16;
+    --warn-soft: #f7ecd3;
+    --danger: #c0453a;
+    --danger-soft: #f6e2e0;
+    --shadow: 0 1px 2px rgba(16,21,28,.04), 0 12px 32px -12px rgba(16,21,28,.18);
+    --mono: ui-monospace, "Cascadia Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    --sans: -apple-system, "Segoe UI", "Malgun Gothic", "Apple SD Gothic Neo", Roboto, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1219; --panel: #141c26; --panel-2: #1b242f; --ink: #eef3f8;
+      --muted: #97a6b6; --faint: #6a7987; --line: #26313d; --accent: #2fd39e;
+      --accent-soft: #123329; --warn: #e2ad4e; --warn-soft: #33290f;
+      --danger: #e8695c; --danger-soft: #3a1c19;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 18px 40px -16px rgba(0,0,0,.55);
+    }
+  }
+  :root[data-theme="light"] {
+    --bg: #f6f8fb; --panel: #ffffff; --panel-2: #eef2f7; --ink: #10151c;
+    --muted: #5c6b7a; --faint: #8a97a5; --line: #dde4ec; --accent: #0f9d78;
+    --accent-soft: #d8f0e7; --warn: #c07d16; --warn-soft: #f7ecd3;
+    --danger: #c0453a; --danger-soft: #f6e2e0;
+    --shadow: 0 1px 2px rgba(16,21,28,.04), 0 12px 32px -12px rgba(16,21,28,.18);
+  }
+  :root[data-theme="dark"] {
+    --bg: #0d1219; --panel: #141c26; --panel-2: #1b242f; --ink: #eef3f8;
+    --muted: #97a6b6; --faint: #6a7987; --line: #26313d; --accent: #2fd39e;
+    --accent-soft: #123329; --warn: #e2ad4e; --warn-soft: #33290f;
+    --danger: #e8695c; --danger-soft: #3a1c19;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 18px 40px -16px rgba(0,0,0,.55);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: var(--sans); background: var(--bg); color: var(--ink);
+    -webkit-font-smoothing: antialiased; line-height: 1.55;
+    display: flex; justify-content: center; padding: clamp(16px, 4vw, 48px) 16px;
+  }
+  .wrap { width: 100%; max-width: 480px; }
+
+  header { margin-bottom: 20px; }
+  .eyebrow { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); font-weight: 700; margin: 0 0 6px; }
+  h1 { font-size: 23px; margin: 0; letter-spacing: -.01em; text-wrap: balance; }
+  .sub { color: var(--muted); font-size: 14px; margin: 6px 0 0; }
+  .theme-btn {
+    float: right; font: inherit; font-size: 12px; color: var(--muted); cursor: pointer;
+    background: transparent; border: 1px solid var(--line); border-radius: 8px; padding: 4px 9px;
+  }
+
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); overflow: hidden; }
+  .inputs { padding: 20px; display: flex; flex-direction: column; gap: 22px; }
+
+  .field { display: flex; flex-direction: column; gap: 9px; }
+  .q { font-size: 15.5px; font-weight: 700; margin: 0; }
+  .q .step { color: var(--accent); font-weight: 800; margin-right: 7px; }
+  .explain { font-size: 12.5px; color: var(--muted); margin: -3px 0 3px; }
+
+  .slider-head { display: flex; justify-content: space-between; align-items: baseline; }
+  .slider-head .big-val { font-family: var(--mono); font-size: 22px; font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .slider-head .cap { font-size: 12px; color: var(--faint); }
+  input[type="range"] { width: 100%; accent-color: var(--accent); height: 24px; margin: 0; }
+  .ticks { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--faint); font-family: var(--mono); margin-top: -4px; }
+
+  .money-row { display: flex; gap: 10px; }
+  .money-cell { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+  .money-cell label { font-size: 12.5px; font-weight: 600; }
+  .money-cell.win label { color: var(--accent); }
+  .money-cell.lose label { color: var(--danger); }
+  .inp { position: relative; display: flex; align-items: center; }
+  .inp input {
+    width: 100%; font-family: var(--mono); font-size: 16px; padding: 10px 34px 10px 26px;
+    border: 1px solid var(--line); border-radius: 10px; background: var(--panel-2);
+    color: var(--ink); font-variant-numeric: tabular-nums; text-align: right;
+  }
+  .money-cell.win input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .money-cell.lose input:focus-visible { outline: 2px solid var(--danger); outline-offset: 1px; }
+  .inp .suffix { position: absolute; right: 12px; font-size: 13px; color: var(--faint); pointer-events: none; }
+  .inp .prefix { position: absolute; left: 12px; font-size: 15px; font-weight: 700; pointer-events: none; font-family: var(--mono); }
+  .money-cell.win .prefix { color: var(--accent); }
+  .money-cell.lose .prefix { color: var(--danger); }
+  .capital-field .inp input { padding-left: 12px; }
+
+  .ratio-line {
+    font-size: 12.5px; color: var(--muted); background: var(--panel-2);
+    border: 1px solid var(--line); border-radius: 9px; padding: 8px 11px; text-align: center;
+  }
+  .ratio-line b { color: var(--ink); font-family: var(--mono); }
+
+  .capital-field label { font-size: 13.5px; font-weight: 600; display: block; margin-bottom: 7px; }
+  .capital-field .inp input { padding-right: 34px; }
+
+  .frac-wrap { display: flex; flex-direction: column; gap: 9px; }
+  .frac-group { display: flex; gap: 6px; }
+  .frac-group button {
+    flex: 1; font-family: var(--sans); font-size: 12.5px; font-weight: 600; padding: 9px 4px;
+    border: 1px solid var(--line); border-radius: 9px; background: var(--panel-2);
+    color: var(--muted); cursor: pointer; transition: .12s; line-height: 1.25;
+  }
+  .frac-group button small { display: block; font-size: 10.5px; font-weight: 500; opacity: .8; }
+  .frac-group button:hover { color: var(--ink); }
+  .frac-group button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+
+  /* ---- 결과 ---- */
+  .readout { border-top: 1px solid var(--line); background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--accent) 6%, transparent)); padding: 24px 20px; }
+  .result-label { font-size: 12.5px; color: var(--muted); font-weight: 600; margin: 0 0 8px; }
+  .headline { font-size: 17px; font-weight: 600; margin: 0; line-height: 1.5; }
+  .headline .money { font-family: var(--mono); font-size: 30px; font-weight: 800; color: var(--accent); letter-spacing: -.01em; }
+  .headline .pctmini { color: var(--muted); font-size: 14px; font-weight: 600; }
+
+  .bar-track { height: 12px; border-radius: 7px; background: var(--panel-2); margin: 20px 0 6px; overflow: hidden; border: 1px solid var(--line); }
+  .bar-fill { height: 100%; width: 0; border-radius: 7px; background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 55%, #ffffff)); transition: width .25s ease; }
+  .bar-scale { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--faint); font-family: var(--mono); }
+
+  .msg { display: none; margin-top: 16px; padding: 12px 14px; border-radius: 11px; font-size: 13px; font-weight: 500; line-height: 1.5; }
+  .msg.show { display: block; }
+  .msg.warn { background: var(--warn-soft); color: var(--warn); }
+  .msg.danger { background: var(--danger-soft); color: var(--danger); }
+  .msg.info { background: var(--accent-soft); color: var(--accent); }
+
+  details.learn { margin-top: 18px; font-size: 13px; }
+  details.learn summary { cursor: pointer; color: var(--muted); font-weight: 600; list-style: none; }
+  details.learn summary::-webkit-details-marker { display: none; }
+  details.learn summary::before { content: "＋ "; color: var(--accent); }
+  details.learn[open] summary::before { content: "－ "; }
+  details.learn .body { color: var(--muted); margin-top: 10px; line-height: 1.65; }
+  details.learn code { font-family: var(--mono); background: var(--panel-2); padding: 1px 5px; border-radius: 4px; font-size: .92em; color: var(--ink); }
+
+  footer { margin-top: 16px; font-size: 11.5px; color: var(--faint); line-height: 1.6; text-align: center; }
+</style>
+
+<div class="wrap">
+  <header>
+    <button class="theme-btn" id="theme" type="button">◐ 테마</button>
+    <p class="eyebrow">돈 관리 · 자산 배분</p>
+    <h1>얼마를 투자하는 게 좋을까?</h1>
+    <p class="sub">아래 세 가지만 채우면, 지금 가진 돈 중 <b>이 한 번의 거래에 얼마를 넣는 게 좋은지</b> 알려드려요.</p>
+  </header>
+
+  <div class="card">
+    <div class="inputs">
+
+      <!-- 1. 승률 -->
+      <div class="field">
+        <p class="q"><span class="step">1</span>이 방법으로 하면, 100번 중 몇 번쯤 이기나요?</p>
+        <p class="explain">과거 경험이나 백테스트 기준으로 대략 잡아주세요.</p>
+        <div class="slider-head">
+          <span class="big-val" id="wr-val">55번</span>
+          <span class="cap" id="wr-cap">= 승률 55%</span>
+        </div>
+        <input type="range" id="wr" min="1" max="99" step="1" value="55">
+        <div class="ticks"><span>100번 중 1번</span><span>50번</span><span>100번 중 99번</span></div>
+      </div>
+
+      <!-- 2. 손익률 -->
+      <div class="field">
+        <p class="q"><span class="step">2</span>한 번 거래하면 보통 몇 % 벌고, 몇 % 잃나요?</p>
+        <p class="explain">이기는 거래 1건, 지는 거래 1건의 평균 수익률·손실률이에요.</p>
+        <div class="money-row">
+          <div class="money-cell win">
+            <label for="win">✔ 이길 때 수익률</label>
+            <div class="inp"><span class="prefix">+</span><input type="number" id="win" min="0" step="0.5" value="12"><span class="suffix">%</span></div>
+          </div>
+          <div class="money-cell lose">
+            <label for="lose">✖ 질 때 손실률</label>
+            <div class="inp"><span class="prefix">−</span><input type="number" id="lose" min="0" step="0.5" value="10"><span class="suffix">%</span></div>
+          </div>
+        </div>
+        <div class="ratio-line" id="ratio">이기면 <b>+12%</b> 벌고 지면 <b>−10%</b> 잃어요 → 손익비 <b>1.20</b></div>
+      </div>
+
+      <!-- 3. 투자 원금 -->
+      <div class="field capital-field">
+        <label for="cap"><span class="step" style="color:var(--accent);font-weight:800;margin-right:7px;">3</span>지금 투자에 쓸 수 있는 돈은 얼마인가요?</label>
+        <div class="inp"><input type="number" id="cap" min="0" step="10" value="1000"><span class="suffix">만원</span></div>
+      </div>
+
+      <!-- 안전 계수 -->
+      <div class="frac-wrap">
+        <p class="q" style="font-size:14px;">얼마나 공격적으로 할까요?</p>
+        <div class="frac-group" id="frac">
+          <button type="button" data-f="1">공격적<small>풀 켈리</small></button>
+          <button type="button" data-f="0.5" aria-pressed="true">안정적<small>하프 켈리 · 추천</small></button>
+          <button type="button" data-f="0.25">보수적<small>쿼터 켈리</small></button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 결과 -->
+    <div class="readout">
+      <p class="result-label" id="rlabel">추천 · 안정적(하프 켈리)</p>
+      <p class="headline" id="headline">
+        <span class="money" id="amount">88만원</span><br>
+        가진 돈의 <b id="pct" style="color:var(--accent)">8.8%</b> 만큼 투자하세요.
+      </p>
+
+      <div class="bar-track"><div class="bar-fill" id="bar"></div></div>
+      <div class="bar-scale"><span>안 넣음</span><span>절반</span><span>전부</span></div>
+
+      <div class="msg" id="msg"></div>
+    </div>
+  </div>
+
+  <details class="learn">
+    <summary>켈리 공식이 뭔가요?</summary>
+    <div class="body">
+      <b>켈리 공식(Kelly Criterion)</b>은 "이길 확률"과 "이기고 질 때의 금액 차이"를 따져서, 장기적으로 돈을 가장 빠르게 불릴 수 있는 <b>한 번의 투자 비중</b>을 알려주는 계산법이에요.<br><br>
+      너무 조금 넣으면 굼뜨게 불어나고, 너무 많이 넣으면 한 번의 연패로 크게 무너집니다. 켈리는 그 사이의 <b>수학적으로 가장 이상적인 지점</b>을 찾아줘요.<br><br>
+      다만 실전에서는 승률·손익비 추정이 틀릴 수 있어 <b>풀 켈리는 위험</b>합니다. 그래서 절반만 쓰는 <b>하프 켈리</b>를 많이 권합니다.<br><br>
+      <span style="opacity:.8">공식: <code>f = (p × b − q) / b</code> · p=이길 확률, q=질 확률(1−p), b=손익비(수익률÷손실률)</span>
+    </div>
+  </details>
+
+  <footer>참고용 계산기입니다. 실제 투자 결정은 본인 책임하에 신중히 하세요.</footer>
+</div>
+
+<script>
+  "use strict";
+  const $ = id => document.getElementById(id);
+  const wr = $("wr"), win = $("win"), lose = $("lose"), cap = $("cap");
+  let fraction = 0.5;
+  const fmt = n => n.toLocaleString("ko-KR", { maximumFractionDigits: 0 });
+
+  // 켈리 공식 (원본 파이썬 로직 이식)
+  function kelly(p, b) {
+    if (!(p > 0 && p < 1)) return { err: "승률은 0과 100% 사이여야 해요." };
+    if (!(b > 0)) return { err: "이길 때 수익률과 질 때 손실률을 0보다 크게 넣어주세요." };
+    const q = 1 - p;
+    const fStar = (p * b - q) / b;
+    return { fStar: fStar <= 0 ? 0 : fStar };
+  }
+
+  function render() {
+    const winsPer100 = parseInt(wr.value, 10);       // 100번 중 이기는 횟수
+    const p = winsPer100 / 100;
+    const w = parseFloat(win.value);                 // 이길 때 수익률 %
+    const l = parseFloat(lose.value);                // 질 때 손실률 %
+    const capital = parseFloat(cap.value);
+    const b = (w > 0 && l > 0) ? w / l : NaN;
+
+    // 승률 표시
+    $("wr-val").textContent = winsPer100 + "번";
+    $("wr-cap").textContent = "= 승률 " + winsPer100 + "%";
+
+    // 손익비 줄
+    if (w > 0 && l > 0) {
+      const pf = n => (n % 1 === 0 ? n.toString() : n.toFixed(1));
+      $("ratio").innerHTML = "이기면 <b>+" + pf(w) + "%</b> 벌고 지면 <b>−" + pf(l) +
+        "%</b> 잃어요 → 손익비 <b>" + b.toFixed(2) + "</b>";
+    } else {
+      $("ratio").innerHTML = "이길 때 수익률과 질 때 손실률을 채워주세요.";
+    }
+
+    const label = fraction === 1 ? "공격적(풀 켈리)" : fraction === 0.5 ? "안정적(하프 켈리)" : "보수적(쿼터 켈리)";
+    $("rlabel").textContent = "추천 · " + label;
+
+    const r = kelly(p, b);
+    const msg = $("msg");
+
+    if (r.err) {
+      $("amount").textContent = "—";
+      $("headline").querySelector("br").nextSibling; // noop
+      $("pct").textContent = "—";
+      $("bar").style.width = "0%";
+      msg.textContent = r.err; msg.className = "msg show danger";
+      return;
+    }
+
+    const applied = r.fStar * fraction;
+    const pctText = (applied * 100).toFixed(1) + "%";
+    const investAmt = isNaN(capital) ? null : capital * applied;
+
+    $("pct").textContent = pctText;
+    $("amount").textContent = investAmt === null ? pctText : fmt(investAmt) + "만원";
+    $("bar").style.width = Math.min(applied * 100, 100) + "%";
+
+    if (r.fStar === 0) {
+      $("amount").textContent = "0원";
+      $("pct").textContent = "0%";
+      $("headline").innerHTML = '<span class="money" style="color:var(--danger)">투자하지 마세요</span><br>이 조건에서는 하면 할수록 손해예요.';
+      msg.innerHTML = "질 확률과 손실률이 커서 <b>장기적으로 돈을 잃는 구조</b>예요. 승률을 높이거나, 이길 때 수익률을 키우고 질 때 손실률을 줄일 방법을 찾아보세요.";
+      msg.className = "msg show danger";
+    } else {
+      $("headline").innerHTML = '<span class="money" id="amount">' +
+        (investAmt === null ? pctText : fmt(investAmt) + "만원") +
+        '</span><br>가진 돈의 <b style="color:var(--accent)">' + pctText + '</b> 만큼 투자하세요.';
+      if (r.fStar > 0.5) {
+        msg.innerHTML = "이론상 비중이 꽤 높게 나와요. 추정이 조금만 빗나가도 크게 흔들릴 수 있으니 <b>'안정적' 또는 '보수적'</b>을 권해요.";
+        msg.className = "msg show warn";
+      } else {
+        msg.innerHTML = "한 번에 전부 걸지 않고 <b>이 비율을 꾸준히 지키는 것</b>이 핵심이에요.";
+        msg.className = "msg show info";
+      }
+    }
+  }
+
+  [wr, win, lose, cap].forEach(el => el.addEventListener("input", render));
+
+  $("frac").addEventListener("click", e => {
+    const btn = e.target.closest("button");
+    if (!btn) return;
+    [...$("frac").children].forEach(b => b.setAttribute("aria-pressed", b === btn));
+    fraction = parseFloat(btn.dataset.f);
+    render();
+  });
+
+  $("theme").addEventListener("click", () => {
+    const root = document.documentElement;
+    const cur = root.getAttribute("data-theme")
+      || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    root.setAttribute("data-theme", cur === "dark" ? "light" : "dark");
+  });
+
+  render();
+</script>
