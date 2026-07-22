@@ -9,6 +9,29 @@
 
 휴대폰·PC 어디서든 링크만 열면 바로 쓸 수 있어요. 밝은/어두운 테마도 지원합니다.
 
+### 📸 미리보기
+
+<p align="center">
+  <img src="images/screenshot-light.png" alt="켈리 공식 계산기 밝은 테마 화면" width="320">
+  &nbsp;&nbsp;
+  <img src="images/screenshot-dark.png" alt="켈리 공식 계산기 어두운 테마 화면" width="320">
+</p>
+
+---
+
+## 💬 문의 · 오픈채팅
+
+궁금한 점이 있으면 편하게 연락 주세요.
+
+- **카카오톡 오픈채팅:** [https://open.kakao.com/o/sUVx4Oli](https://open.kakao.com/o/sUVx4Oli)
+- **전화:** 010-2403-9284
+- **이메일:** masterkyungil@gmail.com
+
+<p align="center">
+  <img src="images/kakao-qr.png" alt="카카오톡 오픈채팅 QR코드" width="180"><br>
+  <sub>📷 QR코드를 찍으면 오픈채팅으로 바로 연결돼요</sub>
+</p>
+
 ---
 
 ## 🤔 켈리 공식이 뭔가요?
