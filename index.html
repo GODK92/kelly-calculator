@@ -139,6 +139,23 @@
   details.learn code { font-family: var(--mono); background: var(--panel-2); padding: 1px 5px; border-radius: 4px; font-size: .92em; color: var(--ink); }
 
   footer { margin-top: 16px; font-size: 11.5px; color: var(--faint); line-height: 1.6; text-align: center; }
+
+  .contact {
+    margin-top: 14px; background: var(--panel); border: 1px solid var(--line);
+    border-radius: 12px; padding: 14px 16px; text-align: center;
+  }
+  .contact .c-title {
+    font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--accent); font-weight: 700; margin: 0 0 9px;
+  }
+  .contact .c-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 18px; }
+  .contact a {
+    display: inline-flex; align-items: center; gap: 6px;
+    color: var(--ink); text-decoration: none; font-size: 13.5px; font-weight: 600;
+  }
+  .contact a:hover { color: var(--accent); }
+  .contact a .ic { font-size: 14px; }
+  .contact a .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
 </style>
 
 <div class="wrap">
@@ -223,6 +240,14 @@
       <span style="opacity:.8">공식: <code>f = (p × b − q) / b</code> · p=이길 확률, q=질 확률(1−p), b=손익비(수익률÷손실률)</span>
     </div>
   </details>
+
+  <div class="contact">
+    <p class="c-title">문의사항</p>
+    <div class="c-links">
+      <a href="tel:+821024039284"><span class="ic">📞</span><span class="num">010-2403-9284</span></a>
+      <a href="mailto:masterkyungil@gmail.com"><span class="ic">✉️</span>masterkyungil@gmail.com</a>
+    </div>
+  </div>
 
   <footer>참고용 계산기입니다. 실제 투자 결정은 본인 책임하에 신중히 하세요.</footer>
 </div>
